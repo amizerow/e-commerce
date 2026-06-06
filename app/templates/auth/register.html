@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Create Account | SmartMarket{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card wide">
+    <h1>Create your account</h1>
+    <p class="muted">Only Buyer and Sellers are registered here!</p>
+    <div class="social-login">
+    <a href="{{ url_for('auth.login_google') }}" class="google-btn">
+        <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            alt="Google"
+        >
+        Sign Up with Google
+    </a>
+</div>
+    <!--<a class="google-btn" href="{{ url_for('auth.login_google') }}">Continue with Google</a>-->
+    <div class="divider"><span>or register with email</span></div>
+    <form method="POST" enctype="multipart/form-data">
+      <div class="form-grid">
+        <div><label>Full Name</label><input type="text" name="full_name" required></div>
+        <div><label>Email</label><input type="email" name="email" required></div>
+        <div><label>Password</label><input type="password" name="password" required></div>
+        <div><label>Confirm Password</label><input type="password" name="confirm_password" required></div>
+        <div><label>Role</label><select name="role" required><option value="Buyer">Buyer</option><option value="Seller">Seller</option></select></div>
+        <div><label>Profile Picture</label><input type="file" name="profile_picture" accept="image/*"></div>
+      </div>
+      <button class="btn btn-primary full" type="submit">Create Account</button>
+    </form>
+    <p class="center">Already registered? <a href="{{ url_for('auth.login') }}">Login</a></p>
+  </div>
+</section>
+{% endblock %}

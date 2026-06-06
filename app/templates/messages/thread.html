@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Message Thread | SmartMarket v2{% endblock %}
+{% block content %}
+<section class="dashboard narrow"><div class="dash-header"><div><h1>Conversation</h1><p>{% if conversation.product %}Product: {{ conversation.product.name }}{% endif %}</p></div><a class="btn btn-outline" href="{{ url_for('routes.inbox') }}">Back to Inbox</a></div><div class="panel chat-box">{% for message in conversation.messages %}<div class="chat-message {% if message.sender_id == current_user.id %}mine{% endif %}"><strong>{{ message.sender.full_name }}</strong><p>{{ message.body }}</p><small>{{ message.created_at.strftime('%Y-%m-%d %H:%M') }}</small></div>{% endfor %}</div><div class="panel"><form method="POST"><label>Reply</label><textarea name="body" rows="4" required></textarea><button class="btn btn-primary">Send Reply</button></form></div></section>
+{% endblock %}

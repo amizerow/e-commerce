@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Login | SmartMarket{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card">
+    <h1>Welcome back</h1>
+    <p class="muted">Login with email/password or Google.</p>
+   <!-- <a class="google-btn" href="{{ url_for('auth.login_google') }}">Continue with Google</a> -->
+    <div class="social-login">
+    <a href="{{ url_for('auth.login_google') }}" class="google-btn">
+        <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            alt="Google Logo"
+            class="google-logo"
+        >
+        Continue with Google
+    </a>
+</div>
+    <div class="divider"><span>or</span></div>
+    <form method="POST">
+      <label>Email</label><input type="email" name="email" required>
+      <label>Password</label><input type="password" name="password" required>
+      <button class="btn btn-primary full" type="submit">Login</button>
+    </form>
+    <form method="POST" action="{{ url_for('auth.resend_verification') }}" class="resend-box">
+      <label>Need another verification email?</label>
+      <div class="inline-form"><input type="email" name="email" placeholder="your@email.com" required><button class="btn btn-outline small" type="submit">Resend</button></div>
+    </form>
+    <p class="center">No account? <a href="{{ url_for('auth.register') }}">Create one</a></p>
+    <p class="center"><a href="{{ url_for('auth.forgot_password') }}">Forgot password?</a></p>
+  </div>
+  </section>
+{% endblock %}

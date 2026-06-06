@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}My Orders | SmartMarket v2{% endblock %}
+{% block content %}
+<section class="dashboard"><div class="dash-header"><div><h1>My Orders</h1><p>Track your order status and delivery details.</p></div><a class="btn btn-outline" href="{{ url_for('routes.buyer_dashboard') }}">Continue Shopping</a></div><div class="panel">{% if orders %}{% for order in orders %}<div class="order-card"><h3>Order #{{ order.id }}</h3><p><strong>Status:</strong> {{ order.status }}</p><p><strong>Total:</strong> {{ order.currency }} {{ '%.2f'|format(order.total_amount) }}</p><p><strong>Delivery:</strong> {{ order.delivery_city }} - {{ order.delivery_address }}</p><h4>Items</h4>{% for item in order.items %}<div class="mini-item"><div><strong>{{ item.product_name or (item.product.name if item.product else 'Product') }}</strong><small>{{ item.quantity }} × {{ item.currency }} {{ '%.2f'|format(item.unit_price) }}</small></div></div>{% endfor %}</div>{% endfor %}{% else %}<div class="empty-state">No orders yet.</div>{% endif %}</div></section>
+{% endblock %}

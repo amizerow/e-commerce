@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard | SmartMarket v2{% endblock %}
+{% block content %}
+<section class="dashboard">
+  <div class="dash-header"><div><h1>Admin Dashboard</h1><p>Approve sellers, monitor orders, and review security activity.</p></div><a class="btn btn-outline" href="{{ url_for('routes.edit_profile') }}">Edit Profile</a></div>
+  <div class="stats-grid"><div class="stat"><span>Users</span><strong>{{ stats.users }}</strong></div><div class="stat"><span>Products</span><strong>{{ stats.products }}</strong></div><div class="stat"><span>Sellers</span><strong>{{ stats.sellers }}</strong></div><div class="stat"><span>Buyers</span><strong>{{ stats.buyers }}</strong></div><div class="stat"><span>Orders</span><strong>{{ stats.orders }}</strong></div></div>
+  <div class="panel">
+  <h2>Analytics Overview</h2>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Users by Role</h3>
+      <canvas id="usersChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Orders by Status</h3>
+      <canvas id="ordersChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Product Stock Status</h3>
+      <canvas id="stockChart"></canvas>
+    </div>
+  </div>
+</div>
+  <div class="panel"><h2>Pending Seller Approvals</h2>{% if pending_sellers %}<div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Verified</th><th>Action</th></tr></thead><tbody>{% for seller in pending_sellers %}<tr><td>{{ seller.full_name }}</td><td>{{ seller.email }}</td><td>{{ 'Yes' if seller.is_verified else 'No' }}</td><td class="actions-cell"><form method="POST" action="{{ url_for('routes.approve_seller', user_id=seller.id) }}"><button class="btn btn-primary small" type="submit">Approve</button></form><form method="POST" action="{{ url_for('routes.reject_seller', user_id=seller.id) }}"><button class="btn btn-outline small" type="submit">Make Buyer</button></form></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state">No sellers pending approval.</div>{% endif %}</div>
+  <div class="panel"><h2>Latest Orders</h2>{% if orders %}{% for order in orders %}<div class="order-card"><h3>Order #{{ order.id }}</h3><p><strong>Buyer:</strong> {{ order.buyer.full_name }}</p><p><strong>Status:</strong> {{ order.status }}</p><p><strong>Total:</strong> {{ order.currency }} {{ '%.2f'|format(order.total_amount) }}</p><p><strong>Date:</strong> {{ order.created_at.strftime('%Y-%m-%d') }}</p><form method="POST" action="{{ url_for('routes.admin_update_order_status', order_id=order.id) }}"><select name="status">{% for st in order_statuses %}<option value="{{ st }}" {% if order.status == st %}selected{% endif %}>{{ st }}</option>{% endfor %}</select><button class="btn btn-outline small">Update</button></form><hr><h4>Delivery Information</h4><p><strong>Name:</strong> {{ order.delivery_full_name or 'Not provided' }}</p><p><strong>Phone:</strong> {{ order.delivery_phone or 'Not provided' }}</p><p><strong>City:</strong> {{ order.delivery_city or 'Not provided' }}</p><p><strong>Address:</strong> {{ order.delivery_address or 'Not provided' }}</p><p><strong>Notes:</strong> {{ order.delivery_notes or 'None' }}</p></div>{% endfor %}{% else %}<div class="empty-state">No orders yet.</div>{% endif %}</div>
+  <div class="panel"><h2>Last Login & Password Reset Monitoring</h2>{% if latest_users %}<div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Last Login</th><th>Days Remaining</th><th>Reset Required</th></tr></thead><tbody>{% for user in latest_users %}<tr><td>{{ user.full_name }}</td><td>{{ user.email }}</td><td>{{ user.role }}</td><td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}</td><td>{{ user.password_days_remaining() }}</td><td>{{ 'Yes' if user.password_reset_required else 'No' }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state">No users found.</div>{% endif %}</div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const usersByRole = {{ users_by_role|tojson }};
+  const ordersByStatus = {{ orders_by_status|tojson }};
+
+  const stockData = {
+    "In Stock": {{ products_in_stock }},
+    "Low Stock": {{ products_low_stock }},
+    "Out of Stock": {{ products_out_stock }}
+  };
+
+  new Chart(document.getElementById("usersChart"), {
+    type: "doughnut",
+    data: {
+      labels: Object.keys(usersByRole),
+      datasets: [{
+        data: Object.values(usersByRole)
+      }]
+    }
+  });
+
+  new Chart(document.getElementById("ordersChart"), {
+    type: "bar",
+    data: {
+      labels: Object.keys(ordersByStatus),
+      datasets: [{
+        label: "Orders",
+        data: Object.values(ordersByStatus)
+      }]
+    }
+  });
+
+  new Chart(document.getElementById("stockChart"), {
+    type: "pie",
+    data: {
+      labels: Object.keys(stockData),
+      datasets: [{
+        data: Object.values(stockData)
+      }]
+    }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const usersByRole = {{ users_by_role|tojson }};
+  const ordersByStatus = {{ orders_by_status|tojson }};
+
+  const stockData = {
+    "In Stock": {{ products_in_stock }},
+    "Low Stock": {{ products_low_stock }},
+    "Out of Stock": {{ products_out_stock }}
+  };
+
+  new Chart(document.getElementById("usersChart"), {
+    type: "doughnut",
+    data: {
+      labels: Object.keys(usersByRole),
+      datasets: [{
+        data: Object.values(usersByRole)
+      }]
+    }
+  });
+
+  new Chart(document.getElementById("ordersChart"), {
+    type: "bar",
+    data: {
+      labels: Object.keys(ordersByStatus),
+      datasets: [{
+        label: "Orders",
+        data: Object.values(ordersByStatus)
+      }]
+    }
+  });
+
+  new Chart(document.getElementById("stockChart"), {
+    type: "pie",
+    data: {
+      labels: Object.keys(stockData),
+      datasets: [{
+        data: Object.values(stockData)
+      }]
+    }
+  });
+});
+</script>
+{% endblock %}
